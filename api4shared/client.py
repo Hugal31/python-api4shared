@@ -11,61 +11,55 @@ logger.addHandler(logging.NullHandler())
 
 class Client:
 
-    _allowed_search_fields = {
-        'query', 'category', 'type', 'genre', 'artist', 'year_min', 'year_max', 'size_min', 'size_max',
-    }
-
     def __init__(self, consumer_key, consumer_secret=None):
         self._oauth = OAuth(client_key=consumer_key, client_secret=consumer_secret)
 
-    def search(self, sort: SortType=None, sort_order: SortOrder=SortOrder.ASC, **params) -> [File]:
+    def search(self, query: str = None,
+               category: Category = None,
+               type: str = None,
+               genre: str = None,
+               artist: str = None,
+               year_min: int = None,
+               year_max: int = None,
+               size_min: int = None,
+               size_max: int = None,
+               sort: SortType = None,
+               sort_order: SortOrder = SortOrder.ASC) -> [File]:
         """
         Search files
 
-        :param sort: Type for the sorting
-        :type sort: SortType
-
-        :param sort_order: Order of the sorting
-        :type sort_order: SortOrder
-
-        :param query: The search string (from 1 to 200 symbols)
-        :type query: str
-
-        :param category: The category of the files to search
-        :type category: Category
-
-        :param type: Type of the file to search (e.g. pdf, mp3, jpg, ...)
-        :type type: str
-
-        :param genre: Filter by music genre
-        :type genre: str
-
-        :param artist: Filter by artist name
-        :type artist: str
-
-        :param year_min: Filter by minimum year of upload
-        :type year_min: int
-
-        :param year_max: Filter by maximum year of upload
-        :type year_max: int
-
+        :param query: The search string (from 1 to 200 symbols).
+        :param category: The category of the files to search.
+        :param type: Type of the file to search (e.g. pdf, mp3, jpg, ...).
+        :param genre: Filter by music genre.
+        :param artist: Filter by artist name.
+        :param year_min: Filter by minimum year of upload.
+        :param year_max: Filter by maximum year of upload.
         :param size_min: Filter by minimum size in bytes.
-        :type size_min: int
-
         :param size_max: Filter by maximum size in bytes.
-        :type size_max: int
+        :param sort: Type for the sorting.
+        :param sort_order: Order of the sorting.
 
-        :return: Return a list of the fetched files
+        :return: Return a list of the fetched files.
         """
+        params = {}
 
-        # Raise if unauthorized parameters
-        for key in params.keys():
-            if key not in Client._allowed_search_fields:
-                raise ValueError('Invalid search key "%s"' % key)
+        def add_param(key, value):
+            if value is not None:
+                params[key] = value
+
+        add_param('query', query)
+        add_param('type', type)
+        add_param('genre', genre)
+        add_param('artist', artist)
+        add_param('year_min', year_min)
+        add_param('year_max', year_max)
+        add_param('size_min', size_min)
+        add_param('size_max', size_max)
 
         # Convert the category into a number
-        if 'category' in params and isinstance(params['category'], Category):
-            params['category'] = params['category']._value_
+        if category is not None:
+            params['category'] = category._value_
 
         # Format the sort parameter
         if sort is not None:
