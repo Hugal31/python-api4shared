@@ -74,7 +74,7 @@ class Client:
     def download(self, id: str) -> bytes:
         url = ' https://api.4shared.com/v1_2/files/%s/download' % id
         response = self._oauth.get(url)
-        return response.content()
+        return response.content
 
     def _get_json(self, url, **kwargs):
         return self._request_json('GET', url, **kwargs)
